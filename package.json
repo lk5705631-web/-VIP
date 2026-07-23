@@ -1,0 +1,34 @@
+{
+  "name": "shimon-word-vip",
+  "version": "1.0.0",
+  "description": "עורך הטקסט של שמעון מהדורת VIP",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Shimon",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0"
+  },
+  "build": {
+    "appId": "com.shimon.wordvip",
+    "productName": "עורך הטקסט של שמעון VIP",
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "language": "1037",
+      "installerLanguages": [
+        "he_IL",
+        "en_US"
+      ]
+    }
+  }
+}

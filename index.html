@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עורך הטקסט של שמעון מהדורת VIP</title>
+    <style>
+        :root {
+            --primary-color: #6200ee;
+            --primary-hover: #4b00c6;
+            --bg-color: #e6e6e6;
+            --toolbar-bg: #f3f4f6;
+            --border-color: #d1d5db;
+            --paper-bg: #ffffff;
+            --text-color: #1f2937;
+            --status-bg: #2b579a;
+        }
+
+        body.dark-mode {
+            --primary-color: #8a2be2;
+            --primary-hover: #7a1fd0;
+            --bg-color: #121212;
+            --toolbar-bg: #1e1e1e;
+            --border-color: #333333;
+            --paper-bg: #2d2d2d;
+            --text-color: #f3f4f6;
+            --status-bg: #1e1e1e;
+        }
+
+        body.gaming-mode {
+            --primary-color: #00ffcc;
+            --primary-hover: #00ccb1;
+            --bg-color: #0f051d;
+            --toolbar-bg: #22092c;
+            --border-color: #3b124d;
+            --paper-bg: #11001c;
+            --text-color: #00ffcc;
+            --status-bg: #22092c;
+        }
+
+        body.sepia-mode {
+            --primary-color: #8b5a2b;
+            --primary-hover: #6e4620;
+            --bg-color: #f4ebd9;
+            --toolbar-bg: #e8d8c3;
+            --border-color: #d3c0a8;
+            --paper-bg: #fbf0d9;
+            --text-color: #433422;
+            --status-bg: #8b5a2b;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* מסך נעילה בהפעלה */
+        #lock-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            direction: rtl;
+        }
+
+        .lock-box {
+            background: var(--paper-bg);
+            color: var(--text-color);
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 350px;
+            border-top: 6px solid var(--primary-color);
+        }
+
+        .lock-box h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 22px;
+        }
+
+        .lock-box input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--paper-bg);
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+        }
+
+        .lock-box button {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .lock-box button:hover {
+            background: var(--primary-hover);
+        }
+
+        #passcode-error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* סרגל כותרת עליון */
+        .app-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 6px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .quick-access {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-quick-icon {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .btn-quick-icon:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* לשוניות */
+        .ribbon-tabs {
+            background-color: var(--toolbar-bg);
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            padding: 4px 12px 0 12px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            padding: 8px 18px;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background: transparent;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            border-color: var(--border-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .ribbon-content {
+            background-color: var(--toolbar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 8px 16px;
+            display: none;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            min-height: 52px;
+        }
+
+        .ribbon-content.active {
+            display: flex;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-left: 10px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .toolbar-group:last-child {
+            border-left: none;
+        }
+
+        button, select, input[type="color"] {
+            height: 34px;
+            padding: 0 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--paper-bg);
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+        }
+
+        button:hover, select:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(98, 0, 238, 0.05);
+        }
+
+        .btn-primary { background-color: #28a745 !important; color: white !important; border: none !important; }
+        .btn-primary:hover { background-color: #218838 !important; }
+        .btn-danger { background-color: #dc3545 !important; color: white !important; border: none !important; }
+        .btn-danger:hover { background-color: #c82333 !important; }
+        .btn-blue { background-color: #007bff !important; color: white !important; border: none !important; }
+        .btn-blue:hover { background-color: #0069d9 !important; }
+
+        .workspace {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .paper-container {
+            width: 794px;
+            min-height: 1123px;
+            background-color: var(--paper-bg);
+            color: var(--text-color);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border-radius: 2px;
+            padding: 70px 80px;
+            box-sizing: border-box;
+            outline: none;
+            direction: rtl;
+            text-align: right;
+            font-size: 16px;
+            line-height: 1.6;
+            user-select: text;
+        }
+
+        .status-bar {
+            background-color: var(--status-bg);
+            color: white;
+            padding: 4px 20px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 35px;
+            right: 25px;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 9999;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #paper, #paper * {
+                visibility: visible;
+            }
+            #paper {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- מסך נעילה בהפעלת התוכנה -->
+    <div id="lock-modal">
+        <div class="lock-box">
+            <h2>🔒 נעילת VIP</h2>
+            <p style="font-size: 14px; margin-bottom: 20px;">הזן את קוד הגישה לפתיחת התוכנה:</p>
+            <input type="password" id="passcode-input" placeholder="••••••" autofocus>
+            <button onclick="checkPasscode()">כניסה למערכת</button>
+            <p id="passcode-error">קוד שגוי! נסה שוב.</p>
+        </div>
+    </div>
+
+    <!-- כותרת עליונה -->
+    <div class="app-header">
+        <span>🚀 עורך הטקסט של שמעון מהדורת VIP</span>
+        <div class="quick-access">
+            <button class="btn-quick-icon" onclick="openFile()" title="פתח קובץ קיים">📂 פתח</button>
+            <button class="btn-quick-icon" onclick="saveFile()" title="שמור (Ctrl+S)">💾 שמור</button>
+            <button class="btn-quick-icon" onclick="saveAsFile()" title="שמירה בשם">📁 שמירה בשם</button>
+            <button class="btn-quick-icon" onclick="printDocument()" title="הדפס (Ctrl+P)">🖨️ הדפסה</button>
+            <button class="btn-quick-icon" onclick="exportPDF()" title="ייצא ל-PDF">📄 ייצוא</button>
+            <button class="btn-quick-icon" onclick="execCmd('undo')">↩️</button>
+            <button class="btn-quick-icon" onclick="execCmd('redo')">↪️</button>
+        </div>
+    </div>
+
+    <!-- סרגל לשוניות -->
+    <div class="ribbon-tabs">
+        <button class="tab-btn active" onclick="switchTab('home')">🏠 בית (עיצוב)</button>
+        <button class="tab-btn" onclick="switchTab('insert')">➕ הוספה</button>
+        <button class="tab-btn" onclick="switchTab('quick')">⚡ טקסטים מהירים</button>
+        <button class="tab-btn" onclick="switchTab('design')">🎨 ערכות נושא</button>
+    </div>
+
+    <!-- תוכן לשונית: בית -->
+    <div id="tab-home" class="ribbon-content active">
+        <div class="toolbar-group">
+            <button class="btn-blue" onclick="openFile()">📂 פתח</button>
+            <button class="btn-primary" onclick="saveFile()">💾 שמור</button>
+            <button class="btn-blue" onclick="printDocument()">🖨️ הדפסה</button>
+            <button class="btn-danger" onclick="exportPDF()">📄 ייצוא ל-PDF</button>
+        </div>
+
+        <div class="toolbar-group">
+            <select onchange="execCmd('fontName', this.value)">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="David">David</option>
+                <option value="Frank Ruhl Hofshi">Frank Ruhl</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Segoe UI" selected>Segoe UI</option>
+            </select>
+
+            <select onchange="execCmd('fontSize', this.value)">
+                <option value="1">10px</option>
+                <option value="2">13px</option>
+                <option value="3" selected>16px</option>
+                <option value="4">18px</option>
+                <option value="5">24px</option>
+                <option value="6">32px</option>
+            </select>
+        </div>
+
+        <div class="toolbar-group">
+            <button onclick="execCmd('bold')"><b>B</b></button>
+            <button onclick="execCmd('italic')"><i>I</i></button>
+            <button onclick="execCmd('underline')"><u>U</u></button>
+            <button onclick="execCmd('strikeThrough')"><s>S</s></button>
+        </div>
+
+        <div class="toolbar-group">
+            <span style="font-size:12px;">צבע:</span>
+            <input type="color" onchange="execCmd('foreColor', this.value)">
+            <span style="font-size:12px;">מרקר:</span>
+            <input type="color" value="#ffff00" onchange="execCmd('hiliteColor', this.value)">
+        </div>
+
+        <div class="toolbar-group">
+            <button onclick="execCmd('justifyRight')">ימין</button>
+            <button onclick="execCmd('justifyCenter')">מרכז</button>
+            <button onclick="execCmd('justifyLeft')">שמאל</button>
+        </div>
+
+        <div class="toolbar-group">
+            <button onclick="execCmd('insertUnorderedList')">• רשימה</button>
+            <button onclick="execCmd('insertOrderedList')">1. מספור</button>
+            <button onclick="execCmd('removeFormat')">🧹 נקה עיצוב</button>
+        </div>
+    </div>
+
+    <!-- תוכן לשונית: הוספה -->
+    <div id="tab-insert" class="ribbon-content">
+        <div class="toolbar-group">
+            <button class="btn-blue" onclick="insertTable()">📊 הוסף טבלה</button>
+            <button onclick="insertHR()">➖ קו מפריד</button>
+        </div>
+
+        <div class="toolbar-group">
+            <button onclick="insertEmoji('😃')">😃</button>
+            <button onclick="insertEmoji('🔥')">🔥</button>
+            <button onclick="insertEmoji('🚀')">🚀</button>
+            <button onclick="insertEmoji('⭐')">⭐</button>
+            <button onclick="insertEmoji('✅')">✅</button>
+        </div>
+
+        <div class="toolbar-group">
+            <button onclick="insertDate()">📅 תאריך נוכחי</button>
+            <button class="btn-primary" onclick="insertVIPStamp()">🏆 חותמת אישור VIP</button>
+        </div>
+    </div>
+
+    <!-- תוכן לשונית: טקסטים מהירים -->
+    <div id="tab-quick" class="ribbon-content">
+        <div class="toolbar-group">
+            <button class="btn-blue" onclick="insertText('שלום, ')">👋 שלום</button>
+            <button class="btn-blue" onclick="insertText('שלום רב,\n')">✉️ שלום רב</button>
+            <button class="btn-blue" onclick="insertText('בוקר טוב! ')">☀️ בוקר טוב</button>
+            <button class="btn-blue" onclick="insertText('\nלהתראות!')">👋 להתראות</button>
+            <button class="btn-blue" onclick="insertText('\nבברכה, ')">📜 בברכה</button>
+            <button class="btn-blue" onclick="insertText('\nתודה רבה!')">🙏 תודה רבה</button>
+        </div>
+    </div>
+
+    <!-- תוכן לשונית: ערכות נושא -->
+    <div id="tab-design" class="ribbon-content">
+        <div class="toolbar-group">
+            <button onclick="setTheme('default')">☀️ יום (ברירת מחדל)</button>
+            <button onclick="setTheme('dark')">🌙 מצב לילה (Dark)</button>
+            <button onclick="setTheme('gaming')">🎮 גיימינג (RGB)</button>
+            <button onclick="setTheme('sepia')">📜 ספיה (קריאה)</button>
+        </div>
+    </div>
+
+    <!-- סביבת עבודה -->
+    <div class="workspace">
+        <div id="paper" class="paper-container" contenteditable="true" spellcheck="false">
+            <h2>מסמך VIP חדש</h2>
+            <p>הקלד את הטקסט שלך כאן...</p>
+        </div>
+    </div>
+
+    <!-- סרגל סטטוס -->
+    <div class="status-bar">
+        <div>
+            <span id="word-count">מילים: 0</span> | 
+            <span id="char-count">תווים: 0</span>
+        </div>
+        <div>
+            <span>גודל דף: A4</span> | 
+            <span id="save-status">מוכן</span>
+        </div>
+    </div>
+
+    <div id="toast">הקובץ נשמר בהצלחה! 💾</div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const paper = document.getElementById('paper');
+        let currentFilePath = null;
+        let currentFilePassword = "";
+
+        // בדיקת קוד כניסה בהפעלה
+        function checkPasscode() {
+            const inputVal = document.getElementById('passcode-input').value;
+            const errorMsg = document.getElementById('passcode-error');
+            
+            if (inputVal === '204060') {
+                document.getElementById('lock-modal').style.display = 'none';
+                paper.focus();
+                updateStats();
+            } else {
+                errorMsg.style.display = 'block';
+                document.getElementById('passcode-input').value = '';
+                document.getElementById('passcode-input').focus();
+            }
+        }
+
+        // אפשרות ללחוץ Enter בתוך תיבת הסיסמה
+        document.getElementById('passcode-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPasscode();
+            }
+        });
+
+        function execCmd(cmd, value = null) {
+            document.execCommand(cmd, false, value);
+            paper.focus();
+            updateStats();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.ribbon-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function insertText(text) {
+            document.execCommand('insertHTML', false, text.replace(/\n/g, '<br>'));
+            paper.focus();
+            updateStats();
+        }
+
+        function insertEmoji(emoji) {
+            document.execCommand('insertText', false, emoji);
+            paper.focus();
+            updateStats();
+        }
+
+        function insertHR() {
+            document.execCommand('insertHorizontalRule', false, null);
+            paper.focus();
+        }
+
+        function insertDate() {
+            const now = new Date().toLocaleDateString('he-IL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.execCommand('insertText', false, now);
+            paper.focus();
+        }
+
+        function insertVIPStamp() {
+            const stampHtml = `<div style="border: 3px dashed #28a745; color: #28a745; display: inline-block; padding: 12px 24px; font-weight: bold; font-size: 18px; margin: 15px 0; border-radius: 8px; background: rgba(40,167,69,0.05);">🏆 אושר על ידי שמעון - VIP</div><br>`;
+            document.execCommand('insertHTML', false, stampHtml);
+            paper.focus();
+        }
+
+        function insertTable() {
+            let html = '<table style="width:100%; border-collapse:collapse; margin:10px 0;">';
+            for (let r = 0; r < 3; r++) {
+                html += '<tr>';
+                for (let c = 0; c < 3; c++) {
+                    html += `<td style="border:1px solid #ccc; padding:8px;">תא ${r+1},${c+1}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</table><br>';
+            document.execCommand('insertHTML', false, html);
+            paper.focus();
+        }
+
+        function setTheme(theme) {
+            document.body.className = '';
+            if (theme !== 'default') {
+                document.body.classList.add(`${theme}-mode`);
+            }
+        }
+
+        function printDocument() {
+            window.print();
+        }
+
+        function updateStats() {
+            const text = paper.innerText || "";
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            
+            document.getElementById('word-count').innerText = `מילים: ${words}`;
+            document.getElementById('char-count').innerText = `תווים: ${chars}`;
+        }
+
+        paper.addEventListener('input', updateStats);
+
+        async function openFile() {
+            const result = await ipcRenderer.invoke('open-file');
+            if (result) {
+                try {
+                    const parsed = JSON.parse(result.content);
+                    currentFilePath = result.filePath;
+                    currentFilePassword = parsed.password || "";
+                    paper.innerHTML = parsed.htmlContent || result.content;
+                } catch (e) {
+                    currentFilePath = result.filePath;
+                    currentFilePassword = "";
+                    paper.innerHTML = result.content;
+                }
+                updateStats();
+                document.getElementById('save-status').innerText = 'נפתח!';
+                showToast('הקובץ נפתח בהצלחה! 📂');
+            }
+        }
+
+        async function saveFile() {
+            try {
+                const data = JSON.stringify({ 
+                    type: "SHIMON_DOCUMENT", 
+                    htmlContent: paper.innerHTML,
+                    password: currentFilePassword 
+                }, null, 2);
+
+                const savedPath = await ipcRenderer.invoke('save-file', { filePath: currentFilePath, content: data });
+                
+                if (savedPath) {
+                    currentFilePath = savedPath;
+                    document.getElementById('save-status').innerText = 'נשמר!';
+                    showToast('הקובץ נשמר בהצלחה! 💾');
+                }
+            } catch (err) {
+                alert("שגיאה בשמירה: " + err.message);
+            }
+        }
+
+        async function saveAsFile() {
+            try {
+                const data = JSON.stringify({ 
+                    type: "SHIMON_DOCUMENT", 
+                    htmlContent: paper.innerHTML,
+                    password: currentFilePassword 
+                }, null, 2);
+
+                const savedPath = await ipcRenderer.invoke('save-as-file', data);
+                
+                if (savedPath) {
+                    currentFilePath = savedPath;
+                    document.getElementById('save-status').innerText = 'נשמר בשם!';
+                    showToast('הקובץ נשמר בשם חדש! 💾');
+                }
+            } catch (err) {
+                alert("שגיאה בשמירה בשם: " + err.message);
+            }
+        }
+
+        async function exportPDF() { 
+            const success = await ipcRenderer.invoke('export-pdf-dialog'); 
+            if (success) {
+                showToast('קובץ ה-PDF נוצר ונשמר בהצלחה! 📄');
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2200);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.key === 'ד')) {
+                e.preventDefault();
+                saveFile();
+            }
+            if (e.ctrlKey && (e.key === 'p' || e.key === 'P' || e.key === 'פ')) {
+                e.preventDefault();
+                printDocument();
+            }
+        });
+    </script>
+</body>
+</html>
